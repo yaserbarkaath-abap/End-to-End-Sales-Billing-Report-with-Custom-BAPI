@@ -159,7 +159,8 @@ ENDFORM.
 *& <--  p2        text                                                                                                                          
 *&---------------------------------------------------------------------*                                                                        
 FORM Change_CSOQ .                                                                                                                              
-  DATA lv_result TYPE bapireturn.                                                                                                               
+  DATA lv_result TYPE bapireturn.     
+*Commemted because im using sap learning hub practise system and this below method will work in real system not in practise
 *  DATA: lv_sender         TYPE uname VALUE 'S43000-13',                                                                                        
 *        lv_recipient_mail TYPE ad_smtpadr VALUE 'yaserbarkaath@gmail.com',                                                                     
 *        lv_subject        TYPE string VALUE 'Alert!!!!!!!!!!!!!!!!!!!!!',                                                                      
