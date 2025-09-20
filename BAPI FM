@@ -1,0 +1,31 @@
+function sbapi_a2_csoq.
+
+*"*"Local Interface:
+*" IMPORTING
+*" VALUE (IV_VBELN_VA) TYPE ZBAPIST_A2-VBELN_VA
+*" VALUE (IV_POSNR_VA) TYPE ZBAPIST_A2-POSNR_VA
+*" VALUE (IV KINENG) TYPE ZBAPIST A2-KINENG
+*" EXPORTING
+*" VALUE (RETURN) TYPE BAPIRETURN
+*" TABLES
+*" BT A2 TYPE ZBAPITT A2
+
+data : lv_subre type sy-subre, ls_a2 type ZBAPIsT_A2.
+update vbap
+set kwmeng = iv_kwmeng
+WHERE vbeln = iv_vbeln_va AND posnr = IV_POSNR_VA.
+lv_subre = sy-subrc.
+if lv_subrc = 0.
+RETURN-type = 's'.
+return-message = 'Quantity Updated Successfully'.
+clear 1s_a2.
+1s_a2-wbeln_va = iv_vbeln_va.
+1s_a2-kwmeng = iv_kwmeng.
+LS_A2-POSNR_VA = IV_POSNR_VA.
+APPEND 1s_a2 TO bt_a2.
+else.
+return-type = 'e'.
+RETURN-message = 'Quantity Not Updated'.
+ENDIE.
+
+ENDEUNCTION.
