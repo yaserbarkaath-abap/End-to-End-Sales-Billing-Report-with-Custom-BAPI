@@ -1,0 +1,214 @@
+*&---------------------------------------------------------------------*                                                                        
+*& Report ZA_2                                                                                                                                  
+*&---------------------------------------------------------------------*                                                                        
+*&                                                                                                                                              
+*&---------------------------------------------------------------------*                                                                        
+**********************************************************************                                                                          
+*sh-sales Header,si-sales Item,bh-billing Header,bi-billing Item,sp-sales Partner,md-Material Data                                              
+*sales_order                                                                                                                                    
+*sales_order_item                                                                                                                               
+*billing_doc                                                                                                                                    
+*billing_item_no                                                                                                                                
+*invoiced_quantity                                                                                                                              
+*material_number                                                                                                                                
+*plant                                                                                                                                          
+*baseunit_of_measure                                                                                                                            
+*company_code                                                                                                                                   
+*billing_type                                                                                                                                   
+*sles_organization                                                                                                                              
+**********************************************************************                                                                          
+REPORT za_2.                                                                                                                                    
+TABLES : vbak,vbap,vbrk,vbrp,vbpa,mara.                                                                                                         
+DATA  it_a2 TYPE  zbapitt_a2.                                                                                                                   
+DATA : it_field    TYPE slis_t_fieldcat_alv, wa_fieldcat TYPE slis_fieldcat_alv.                                                                
+" 2 radio button                                                                                                                                
+SELECTION-SCREEN BEGIN OF BLOCK b2 WITH FRAME TITLE TEXT-002.                                                                                   
+  PARAMETERS : rb_dsy   RADIOBUTTON GROUP b1,                                                                                                   
+               rb_cng   RADIOBUTTON GROUP b1,                                                                                                   
+               p_vbeln  TYPE vbeln_va,                                                                                                          
+               p_posnr  TYPE posnr_va,                                                                                                          
+               p_kwmeng TYPE kwmeng.                                                                                                            
+SELECTION-SCREEN END OF BLOCK b2.                                                                                                               
+" 6 select options                                                                                                                              
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE TEXT-001.                                                                                   
+  "output based on selected radio button                                                                                                        
+  SELECT-OPTIONS : s_vbeln FOR vbak-vbeln,                                                                                                      
+                   s_fkart FOR vbrk-fkart,                                                                                                      
+                   s_FKDAT FOR vbrk-fkdat DEFAULT sy-datum,                                                                                     
+                   s_matnr FOR mara-matnr,                                                                                                      
+                   s_MTART FOR mara-mtart ,                                                                                                     
+                   s_kwmeng FOR vbap-kwmeng.                                                                                                    
+SELECTION-SCREEN END OF BLOCK b1.                                                                                                               
+IF rb_dsy = 'X'.                                                                                                                                
+  PERFORM Display_Data.                                                                                                                         
+ELSE.                                                                                                                                           
+  PERFORM Change_CSOQ.                                                                                                                          
+ENDIF.                                                                                                                                          
+FORM Display_Data.                                                                                                                              
+  "select query                                                                                                                                 
+  SELECT                                                                                                                                        
+    FROM vbak AS sh INNER JOIN vbap AS si ON sh~vbeln = si~vbeln                                                                                
+    INNER JOIN vbrp AS bi ON si~vbeln = bi~vgbel AND si~posnr = bi~vgpos                                                                        
+    INNER JOIN vbrk AS bh ON bi~vbeln = bh~vbeln                                                                                                
+    INNER JOIN vbpa AS sp ON bh~vbeln = sp~vbeln                                                                                                
+    INNER JOIN mara AS md ON si~matnr = md~matnr                                                                                                
+    FIELDS                                                                                                                                      
+      sh~vbeln AS vbeln_va,                                                                                                                     
+    si~posnr AS posnr_va,                                                                                                                       
+      bh~vbeln AS vbeln_vf,                                                                                                                     
+      bi~posnr AS posnr_vf,                                                                                                                     
+      bi~fkimg AS fkimg,                                                                                                                        
+      md~matnr AS matnr,                                                                                                                        
+      si~werks AS werks,                                                                                                                        
+      bi~meins AS meins,                                                                                                                        
+      bi~bukrs_ana AS bukrs,                                                                                                                    
+      bi~fkart_ana AS fkart,                                                                                                                    
+      sh~vkorg AS vkorg                                                                                                                         
+    WHERE                                                                                                                                       
+      sh~vbeln IN @s_vbeln AND                                                                                                                  
+      bh~fkart IN @s_fkart AND                                                                                                                  
+      bh~fkdat IN @s_fkdat AND                                                                                                                  
+      md~matnr IN @s_matnr AND                                                                                                                  
+      md~mtart IN @s_mtart AND                                                                                                                  
+      si~kwmeng IN @s_kwmeng                                                                                                                    
+    INTO TABLE @it_a2.                                                                                                                          
+  "fieldcatlogs as per requirements                                                                                                             
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'vbeln_va'.                                                                                                           
+  wa_fieldcat-seltext_l = 'sales order'.                                                                                                        
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'posnr_va'.                                                                                                           
+  wa_fieldcat-seltext_l = 'sales order item'.                                                                                                   
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'vbeln_vf'.                                                                                                           
+  wa_fieldcat-seltext_m = 'Billing Doc'.                                                                                                        
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'posnr_vf'.                                                                                                           
+  wa_fieldcat-seltext_l = 'Billing Item No'.                                                                                                    
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'fkimg'.                                                                                                              
+  wa_fieldcat-seltext_l = 'Invoiced Quantity'.                                                                                                  
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'matnr'.                                                                                                              
+  wa_fieldcat-seltext_m = 'Material Number'.                                                                                                    
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'werks'.                                                                                                              
+  wa_fieldcat-seltext_s = 'Plant'.                                                                                                              
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'bukrs'.                                                                                                              
+  wa_fieldcat-seltext_m = 'Company Code'.                                                                                                       
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'meins'.                                                                                                              
+  wa_fieldcat-seltext_l = 'Base Unit of Measure'.                                                                                               
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'fkart'.                                                                                                              
+  wa_fieldcat-seltext_m = 'Billing Type'.                                                                                                       
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  CLEAR wa_fieldcat.                                                                                                                            
+  wa_fieldcat-fieldname = 'vkorg'.                                                                                                              
+  wa_fieldcat-seltext_l = 'Sales Organization'.                                                                                                 
+  APPEND wa_fieldcat TO it_field.                                                                                                               
+  "function call to use alv grid                                                                                                                
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'                                                                                                        
+    EXPORTING                                                                                                                                   
+      i_callback_program       = sy-repid " to call current progarm                                                                             
+      i_callback_pf_status_set = 'PF_STATUS' " custom toolbar call                                                                              
+      i_callback_user_command  = 'COMMAND' " user actions                                                                                       
+      it_fieldcat              = it_field                                                                                                       
+    TABLES                                                                                                                                      
+      t_outtab                 = it_a2.                                                                                                         
+ENDFORM.                                                                                                                                        
+FORM pf_status USING extab TYPE slis_t_extab.                                                                                                   
+  SET PF-STATUS 'CUSTOM'. "custom toolbar                                                                                                       
+ENDFORM.                                                                                                                                        
+FORM command USING click LIKE sy-ucomm rs_selfield TYPE slis_selfield.                                                                          
+  IF click = 'A2XML'. "export to xml name in the toolbar                                                                                        
+    DATA: wa_xml    TYPE string,                                                                                                                
+          lt_xml    TYPE TABLE OF string,                                                                                                       
+          file_name TYPE string.                                                                                                                
+    CALL TRANSFORMATION z_xml_a2                                                                                                                
+      SOURCE xml_a2 = it_a2                                                                                                                     
+      RESULT XML wa_xml.                                                                                                                        
+    CLEAR lt_xml.                                                                                                                               
+    APPEND wa_xml TO lt_xml.                                                                                                                    
+    CALL FUNCTION 'GUI_DOWNLOAD'                                                                                                                
+      EXPORTING                                                                                                                                 
+        filename = 'C:\Users\train-15\Downloads\Assignment2.xml'                                                                                
+*XML parser errors (because of unexpected bytes before <)                                                                                       
+        codepage = '4110'                                                                                                                       
+      TABLES                                                                                                                                    
+        data_tab = lt_xml.                                                                                                                      
+    MESSAGE i002(za_2).                                                                                                                         
+  ENDIF.                                                                                                                                        
+ENDFORM.                                                                                                                                        
+*&---------------------------------------------------------------------*                                                                        
+*& Form Change_CSOQ                                                                                                                             
+*&---------------------------------------------------------------------*                                                                        
+*& text                                                                                                                                         
+*&---------------------------------------------------------------------*                                                                        
+*& -->  p1        text                                                                                                                          
+*& <--  p2        text                                                                                                                          
+*&---------------------------------------------------------------------*                                                                        
+FORM Change_CSOQ .                                                                                                                              
+  DATA lv_result TYPE bapireturn.                                                                                                               
+*  DATA: lv_sender         TYPE uname VALUE 'S43000-13',                                                                                        
+*        lv_recipient_mail TYPE ad_smtpadr VALUE 'yaserbarkaath@gmail.com',                                                                     
+*        lv_subject        TYPE string VALUE 'Alert!!!!!!!!!!!!!!!!!!!!!',                                                                      
+*        lv_message        TYPE string VALUE 'Sales order quanity has been Updated'.                                                            
+*  DATA(it_mail) = cl_document_bcs=>string_to_soli( ip_string = lv_message ).                                                                   
+  data msg type REF TO cl_bcs_message.                                                                                                          
+  CREATE OBJECT msg.                                                                                                                            
+                                                                                                                                                
+                                                                                                                                                
+  CALL FUNCTION 'ZBAPI_A2_CSOQ'                                                                                                                 
+    EXPORTING                                                                                                                                   
+      iv_vbeln_va = p_vbeln                                                                                                                     
+      iv_kwmeng   = p_kwmeng                                                                                                                    
+      iv_posnr_va = p_posnr                                                                                                                     
+    IMPORTING                                                                                                                                   
+      return      = lv_result                                                                                                                   
+    TABLES                                                                                                                                      
+      bt_a2       = it_a2.                                                                                                                      
+  IF lv_result-type = 's'.                                                                                                                      
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'                                                                                                     
+      EXPORTING                                                                                                                                 
+        wait = 'X'.                                                                                                                             
+    MESSAGE i000(za_2).                                                                                                                         
+msg->set_subject('ALERT').                                                                                                                      
+msg->add_recipient('YaserBarkaath@gmail.com').                                                                                                  
+msg->set_main_doc('uapted using bapi').                                                                                                         
+msg->send( ).                                                                                                                                   
+*    TRY.                                                                                                                                       
+*        "craete documnet                                                                                                                       
+*        DATA(o_doc) = cl_document_bcs=>create_document( i_type = 'RAW' i_text = it_mail i_subject = conv so_obj_des( lv_subject )  ).          
+*        "create send request                                                                                                                   
+*        DATA(o_send_request) = cl_bcs=>create_persistent( ).                                                                                   
+*        o_send_request->set_message_subject( ip_subject = lv_subject ).                                                                        
+*        o_send_request->set_document( o_doc ).                                                                                                 
+*        "craete sap user request                                                                                                               
+*        DATA(o_sender) = cl_sapuser_bcs=>create( lv_sender ).                                                                                  
+*        o_send_request->set_sender( o_sender ).                                                                                                
+*        "set recipient                                                                                                                         
+*                                                                                                                                               
+*        DATA(o_set_recipient) = cl_cam_address_bcs=>create_internet_address( lv_recipient_mail ).                                              
+*        o_send_request->add_recipient( i_recipient = o_set_recipient i_express   = abap_true ).                                                
+*        o_send_request->set_send_immediately( abap_true ).                                                                                     
+*        "send documnet                                                                                                                         
+*        o_send_request->send( i_with_error_screen = abap_true ).                                                                               
+*        COMMIT WORK.                                                                                                                           
+*      CATCH cx_root INTO DATA(e_text).                                                                                                         
+*        WRITE : / e_text->get_text( ).                                                                                                         
+*    ENDTRY.                                                                                                                                    
+  ELSE.                                                                                                                                         
+    MESSAGE a001(za_2).                                                                                                                         
+  ENDIF.                                                                                                                                        
+ENDFORM.                                                                                                                                        
