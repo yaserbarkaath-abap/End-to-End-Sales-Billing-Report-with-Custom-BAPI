@@ -1,7 +1,7 @@
 @EndUserText.label : 'Structure to use in pgrm and bapi'                 
 @AbapCatalog.enhancement.category : #NOT_EXTENSIBLE                      
 define structure zbapist_a2 {                                            
-                                                                         
+                                                                      
   vbeln_va : vbeln_va;                                                   
   posnr_va : posnr_va;                                                   
   vbeln_vf : vbeln_vf;                                                   
