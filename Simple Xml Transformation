@@ -1,0 +1,23 @@
+<?sap.transform simple?>                                                                                                                                                           
+<tt:transform xmlns:tt="http://www.sap.com/transformation-templates" xmlns:ddic="http://www.sap.com/abapxml/types/dictionary" xmlns:def="http://www.sap.com/abapxml/types/defined">
+  <tt:root name="XML_A2" type="ddic:ZBAPITT_A2"/>                                                                                                                                  
+  <tt:template>                                                                                                                                                                    
+    <XML_A2>                                                                                                                                                                       
+      <tt:loop ref=".XML_A2">                                                                                                                                                      
+        <ZBAPIST_A2>                                                                                                                                                               
+          <VBELN_VA tt:value-ref="VBELN_VA"/>                                                                                                                                      
+          <POSNR_VA tt:value-ref="POSNR_VA"/>                                                                                                                                      
+          <VBELN_VF tt:value-ref="VBELN_VF"/>                                                                                                                                      
+          <POSNR_VF tt:value-ref="POSNR_VF"/>                                                                                                                                      
+          <FKIMG tt:value-ref="FKIMG"/>                                                                                                                                            
+          <MATNR tt:value-ref="MATNR"/>                                                                                                                                            
+          <WERKS tt:value-ref="WERKS"/>                                                                                                                                            
+          <MEINS tt:value-ref="MEINS"/>                                                                                                                                            
+          <BUKRS tt:value-ref="BUKRS"/>                                                                                                                                            
+          <FKART tt:value-ref="FKART"/>                                                                                                                                            
+          <VKORG tt:value-ref="VKORG"/>                                                                                                                                            
+        </ZBAPIST_A2>                                                                                                                                                              
+      </tt:loop>                                                                                                                                                                   
+    </XML_A2>                                                                                                                                                                      
+  </tt:template>                                                                                                                                                                   
+</tt:transform>                                                                                                                                                                    
