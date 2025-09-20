@@ -1,7 +1,7 @@
 # End-to-End-Sales-Billing-Report-with-Custom-BAPI
 I’m excited to share my hands-on experience with Assignment 
 where I developed a complete ABAP report (ZA_2)
-To manage sales order and billing data — including display, update, and messaging functionalities.
+To manage sales order and billing data including display, update, and messaging functionalities.
 
 ------------------------------------------------------------------------------------------------------------------------
 
