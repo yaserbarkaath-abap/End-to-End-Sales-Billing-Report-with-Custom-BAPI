@@ -1,4 +1,4 @@
-<h1>End-to-End Sales Billing Report with Custom BAPI</h1>
+<h1>Sales Billing Report with Custom BAPI</h1>
 
 <p>I’m excited to share my hands on experience with an assignment where I developed a complete ABAP report (<b>ZA_2</b>) to manage sales order and billing data including display, update, and messaging functionalities.</p>
 
